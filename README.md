@@ -1,5 +1,6 @@
 Commenti ADG
 Per avviare: 
+
 -> init.py: si occupa di creare la gerarchia delle directory, data_generation (ha bisogno di train.npy, test.npy, template.obj). Questa si chiama, in generale, una sola volta. 
 
 -> create_downsampling_matrices.py: crea le matrici di downsampling. Serve mpi-mesh. Qui si può andare ad agire, volessimo cambiare il downsampling. 
