@@ -29,14 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description="neural 3DMM ...")
     parser.add_argument("--GPU", dest="GPU", default=True, help="GPU is available")
     parser.add_argument("--device", dest="device_idx", default='0', help="choose GPU")
-    # parser.add_argument("--root_dir", dest="root_dir", default=None, help="Root data directory location")
-    # parser.add_argument("--dataset", dest="dataset_name", default=None, help="name of dataset folder ??")
-    # parser.add_argument("--downsample_m", dest="downsample_method", default='COMA_downsample',
-    #                     help="Name of downsample method")
-    # parser.add_argument("--generative_m", dest="generative_model", default='autoencoder', help="autoencoder...type ?")
-    # parser.add_argument("--name", dest="name", default='', help="Name")
-    # parser.add_argument("--nVal", dest="nVal", default=100, help="nVal")
-    parser.add_argument("--num_v", dest="num_valid", default=100, help="Number valid for data_generation")
+
     parser.add_argument("--seed", dest="seed", default=2, help="Seed ...")
     parser.add_argument("--loss", dest="loss", default='l1', help="Loss type")
     parser.add_argument("--batch_size", dest="batch_size", default=16, help="Batch size")
@@ -60,8 +53,8 @@ def main():
     parser.add_argument("--mode", dest="mode", default='train', help="Mode")
     parser.add_argument("--shuffle", dest="shuffle", default=True, help="Shuffle")
     parser.add_argument("--normalization", dest="normalization", default=True, help="Normalization")
-    parser.add_argument("--decay_rate", dest="decay_rate", default=0.99, help="decay_rate")
     parser.add_argument("--checkpoint_file", dest="checkpoint_file", default='checkpoint', help="checkpoint_file")
+    parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")
 
     args = parser.parse_args()
 
@@ -69,16 +62,10 @@ def main():
         dict_path = json.load(json_file)
 
     GPU = args.GPU
-    device_idx = args.device_idx
-    torch.cuda.get_device_name(device_idx)
-
-    # results_folder = os.path.join(args.root_dir, 'results/spirals_ ' + args.generative_model)
-    # data = os.path.join(args.root_dir, 'preprocessed', args.name)
+    # device_idx = args.device_idx
+    # torch.cuda.get_device_name(device_idx)
 
     data = dict_path['data']
-
-    # Folder and data_generation
-    # init_func(args, dict_path, data)
 
     if os.path.exists(data + '/mean.npy') or not os.path.exists(data + '/std.npy'):
         np.random.seed(args.seed)
@@ -87,7 +74,8 @@ def main():
         torch.manual_seed(args.seed)
 
         if GPU:
-            device = torch.device("cuda:" + str(device_idx) if torch.cuda.is_available() else "cpu")
+            # device = torch.device("cuda:" + str(device_idx) if torch.cuda.is_available() else "cpu")
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             device = torch.device("cpu")
         print(device)
@@ -118,7 +106,7 @@ def main():
         dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size,
                                      shuffle=False, num_workers=args.num_workers)
 
-        if 'autoencoder' in args.generative_model:
+        if 'autoencoder' in dict_path['generative_model']:
             model = SpiralAutoencoder(filters_enc=args.filter_sizes_enc,
                                       filters_dec=args.filter_sizes_dec,
                                       latent_size=args.nz,

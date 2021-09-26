@@ -21,7 +21,7 @@ def create_downsampling_matrices(args):
                           test_file=data + '/test.npy',
                           reference_mesh_file=dict_path['reference_mesh_file'],
                           normalization=args.normalization,
-                          meshpackage=meshpackage, load_flag=False)
+                          meshpackage=meshpackage, load_flag=True)
 
     if not os.path.exists(data + '/mean.npy') or not os.path.exists(data + '/std.npy'):
         np.save(data + '/mean.npy', shapedata.mean)
@@ -34,6 +34,7 @@ def create_downsampling_matrices(args):
         shapedata.std = np.load(dict_path['data'] + '/std.npy')
         shapedata.n_vertex = shapedata.mean.shape[0]
         shapedata.n_features = shapedata.mean.shape[1]
+        print("Load OK ")
 
     # downsampling_matrices.pkl
     if not os.path.exists(os.path.join(dict_path['downsample_directory'], 'downsampling_matrices.pkl')):

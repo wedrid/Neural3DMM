@@ -15,7 +15,7 @@ def train_autoencoder_dataloader(dataloader_train, dataloader_val,
 
     total_steps = start_epoch * len(dataloader_train)
 
-    for epoch in range(start_epoch, n_epochs):
+    for epoch in range(start_epoch, int(n_epochs)):
         model.train()
 
         tloss = []

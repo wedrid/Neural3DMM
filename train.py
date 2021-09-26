@@ -9,9 +9,9 @@ from tensorboardX import SummaryWriter
 def train(model, device, dataloader_train, dataloader_val, optim, loss_fn, args, dict_path,
           scheduler, shapedata):
     writer = SummaryWriter(dict_path['summary_path'])
-    with open(os.path.join(dict_path['checkpoints'], args.name + '_params.json'), 'w') as fp:
-        saveparams = copy.deepcopy(args)  # TODO args non è un dizionario
-        json.dump(saveparams, fp)
+    # with open(os.path.join(dict_path['checkpoints'], args.name + '_params.json'), 'w') as fp:
+    #     saveparams = copy.deepcopy(args)  # TODO: capire se serve
+    #     json.dump(saveparams, fp)
 
     if args.resume:
         print('loading checkpoint from file %s' % (os.path.join(dict_path['checkpoint_path'], args.checkpoint_file)))
@@ -25,12 +25,12 @@ def train(model, device, dataloader_train, dataloader_val, optim, loss_fn, args,
     else:
         start_epoch = 0
 
-    if args.generative_model == 'autoencoder':
+    if dict_path['generative_model'] == 'autoencoder':
         train_autoencoder_dataloader(dataloader_train, dataloader_val,
                                      device, model, optim, loss_fn,
                                      bsize=args.batch_size,  # args['batch_size']
                                      start_epoch=start_epoch,
-                                     n_epochs=args.num_epochs,  # args['num_epochs']
+                                     n_epochs=args.epochs,  # args['num_epochs']
                                      eval_freq=args.eval_frequency,  # args['eval_frequency']
                                      scheduler=scheduler,
                                      writer=writer,
