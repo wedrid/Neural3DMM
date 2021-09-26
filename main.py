@@ -1,7 +1,7 @@
 # Richiede di aver chiamato init.py una volta e create_downsampling_matrices.py almeno una volta.
 # fare solo il training, una volta che si hanno già le matrici di downsampling
+
 import os
-from init import init_func
 from train import train
 from test import test
 import torch
@@ -10,7 +10,8 @@ from models import SpiralAutoencoder
 from autoencoder_dataset import autoencoder_dataset
 from transform_matrices import matrices_tr
 import argparse
-
+import numpy as np
+import json
 
 ds_factors = [4, 4, 4, 4]
 step_sizes = [2, 2, 1, 1, 1]
@@ -28,12 +29,13 @@ def main():
     parser = argparse.ArgumentParser(description="neural 3DMM ...")
     parser.add_argument("--GPU", dest="GPU", default=True, help="GPU is available")
     parser.add_argument("--device", dest="device_idx", default='0', help="choose GPU")
-    parser.add_argument("--root_dir", dest="root_dir", default=None, help="Root data directory location")
-    #parser.add_argument("--dataset", dest="dataset_name", default=None, help="name of dataset folder ??")
-    parser.add_argument("--downsample_m", dest="downsample_method", default='COMA_downsample',
-                        help="Name of downsample method")
-    parser.add_argument("--generative_m", dest="generative_model", default='autoencoder', help="autoencoder... type ?")
-    parser.add_argument("--name", dest="name", default='', help="Name")
+    # parser.add_argument("--root_dir", dest="root_dir", default=None, help="Root data directory location")
+    # parser.add_argument("--dataset", dest="dataset_name", default=None, help="name of dataset folder ??")
+    # parser.add_argument("--downsample_m", dest="downsample_method", default='COMA_downsample',
+    #                     help="Name of downsample method")
+    # parser.add_argument("--generative_m", dest="generative_model", default='autoencoder', help="autoencoder...type ?")
+    # parser.add_argument("--name", dest="name", default='', help="Name")
+    # parser.add_argument("--nVal", dest="nVal", default=100, help="nVal")
     parser.add_argument("--num_v", dest="num_valid", default=100, help="Number valid for data_generation")
     parser.add_argument("--seed", dest="seed", default=2, help="Seed ...")
     parser.add_argument("--loss", dest="loss", default='l1', help="Loss type")
@@ -57,35 +59,30 @@ def main():
     parser.add_argument("--resume", dest="resume", default=False, help="decay_steps")
     parser.add_argument("--mode", dest="mode", default='train', help="Mode")
     parser.add_argument("--shuffle", dest="shuffle", default=True, help="Shuffle")
-    parser.add_argument("--nVal", dest="nVal", default=100, help="nVal")
     parser.add_argument("--normalization", dest="normalization", default=True, help="Normalization")
     parser.add_argument("--decay_rate", dest="decay_rate", default=0.99, help="decay_rate")
     parser.add_argument("--checkpoint_file", dest="checkpoint_file", default='checkpoint', help="checkpoint_file")
 
     args = parser.parse_args()
 
+    with open(args.dict_path) as json_file:
+        dict_path = json.load(json_file)
+
     GPU = args.GPU
     device_idx = args.device_idx
     torch.cuda.get_device_name(device_idx)
 
-    results_folder = os.path.join(args.root_dir, 'results/spirals_ ' + args.generative_model)
-    data = os.path.join(args.root_dir, 'preprocessed', args.name)
-    dict_path = {
-        'reference_mesh_file': os.path.join(args.root_dir, 'template', 'template.obj'),
-        'downsample_directory': os.path.join(args.root_dir, 'template', args.downsample_method),
-        'summary_path': os.path.join(results_folder, 'summaries', args.name),
-        'checkpoint_path': os.path.join(results_folder, 'checkpoints', args.name),
-        'samples_path': os.path.join(results_folder, 'samples', args.name),
-        'prediction_path': os.path.join(results_folder, 'predictions', args.name),
-        'points_train_path': os.path.join(data, 'points_train'),
-        'points_val_path': os.path.join(data, 'points_val'),
-        'points_test_path': os.path.join(data, 'points_test')
-    }
+    # results_folder = os.path.join(args.root_dir, 'results/spirals_ ' + args.generative_model)
+    # data = os.path.join(args.root_dir, 'preprocessed', args.name)
+
+    data = dict_path['data']
 
     # Folder and data_generation
-    init_func(args, dict_path, data)
-    if os.path.exists(data +'/mean.npy') or not os.path.exists(data+'/std.npy'):
-        shapedata, sizes, bU, bD, spirals_np, spiral_sizes, spirals = matrices_tr(args, reference_points)
+    # init_func(args, dict_path, data)
+
+    if os.path.exists(data + '/mean.npy') or not os.path.exists(data + '/std.npy'):
+        np.random.seed(args.seed)
+        shapedata, sizes, bU, bD, spirals_np, spiral_sizes, spirals = matrices_tr(args, reference_points, dict_path)
         # Model
         torch.manual_seed(args.seed)
 
@@ -143,7 +140,6 @@ def main():
 
             loss_fn = loss_l1
 
-        # %%
         params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         print("Total number of parameters is: {}".format(params))
         print(model)

@@ -10,7 +10,7 @@ def train(model, device, dataloader_train, dataloader_val, optim, loss_fn, args,
           scheduler, shapedata):
     writer = SummaryWriter(dict_path['summary_path'])
     with open(os.path.join(dict_path['checkpoints'], args.name + '_params.json'), 'w') as fp:
-        saveparams = copy.deepcopy(args) #TODO args non è un dizionario
+        saveparams = copy.deepcopy(args)  # TODO args non è un dizionario
         json.dump(saveparams, fp)
 
     if args.resume:
@@ -28,10 +28,10 @@ def train(model, device, dataloader_train, dataloader_val, optim, loss_fn, args,
     if args.generative_model == 'autoencoder':
         train_autoencoder_dataloader(dataloader_train, dataloader_val,
                                      device, model, optim, loss_fn,
-                                     bsize=args['batch_size'],
+                                     bsize=args.batch_size,  # args['batch_size']
                                      start_epoch=start_epoch,
-                                     n_epochs=args['num_epochs'],
-                                     eval_freq=args['eval_frequency'],
+                                     n_epochs=args.num_epochs,  # args['num_epochs']
+                                     eval_freq=args.eval_frequency,  # args['eval_frequency']
                                      scheduler=scheduler,
                                      writer=writer,
                                      save_recons=True,

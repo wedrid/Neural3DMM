@@ -7,6 +7,15 @@ Per avviare:
 
 -> main.py: si avvia il training.. da definirsi il dettaglio. 
 
+## Sequenza chiamate (per ora): 
+- `python init.py --root_dir path_to_root_dir --bool 0`  // crea la gerarchia delle cartelle sotto root_dir
+- Inserisco train.npy e test.npy in preprocessed. Inserisco template.obj in template.
+  (qui poi in pratica questi file dovranno essere generabili ... abbiamo bisogno di una funzione che ci faccia lo split
+  e poi in base a quello li generi )
+- `python init.py --root_dir path_to_root_dir --bool 1` // genera i file paths_train.npy etc 
+- [Se eseguito in locale per Chiara e Niki] `python rename_paths.py --json_file path_to_dict_path_json_file --heading /mnt/c/`
+- `python create_downsampling_matrices --dict path_to_dict_path_json` // se eseguito in locale per Chiara e Niki - usare il file con wls
+- `python main.py ...`
 
 -------------------------------------------
 ![Neural3DMM architecture](images/architecture_figure1.png "Neural3DMM architecture")
