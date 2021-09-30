@@ -1,0 +1,116 @@
+from os import listdir
+from os.path import isfile, join
+
+import open3d as o3d
+import numpy as np
+
+from tqdm import tqdm
+
+def get_numpy_from_file(input_file):
+    pcd = o3d.io.read_point_cloud(input_file) # Read the point cloud
+
+    # Visualize the point cloud within open3d
+    #o3d.visualization.draw_geometries([pcd]) 
+
+    # Convert open3d format to numpy array
+    # Here, you have the point cloud in numpy format. 
+    numpy_point_cloud = np.asarray(pcd.points) 
+    #print(numpy_point_cloud.shape)
+    return numpy_point_cloud
+
+
+# vogliamo: train.npy (number_meshes, number_vertices, 3) (no Faces because they all share topology)
+# ------ args: 
+# TODO da convertire in args o da cacolare....
+train_pct = None
+test_set = {9, 10, 11}
+num_individui = 12 #indici vanno da 0 a 11 #questo è possibile ricavarlo..... 
+# -------- end args
+
+directory = "./COMA_data_nasi"
+total_set = set(range(12))
+
+train_set = total_set - test_set
+
+
+
+sample_file = directory + "/" + "FaceTalk_170725_00137_TA/bareteeth/bareteeth.000001.ply"
+complete = np.zeros(get_numpy_from_file(sample_file).shape)
+complete = np.expand_dims(complete, axis=0)
+
+complete_train = np.zeros(get_numpy_from_file(sample_file).shape)
+complete_train = np.expand_dims(complete_train, axis=0)
+
+complete_test = np.zeros(get_numpy_from_file(sample_file).shape)
+complete_test = np.expand_dims(complete_test, axis=0)
+
+
+subdir_list = [f for f in listdir(directory) if not isfile(join(directory, f))]
+print(subdir_list)
+i = 0
+tot = 0
+for subdir in tqdm(subdir_list):
+    #print(f"Iteration {i} of {len(subdir_list)}")
+    temp_subdir = directory + "/" + subdir
+    subsubdir_list = [f for f in listdir(temp_subdir) if not isfile(join(temp_subdir, f))]
+    for subsubdir in tqdm(subsubdir_list, leave= False):
+        temp_subsubdir = temp_subdir + "/" + subsubdir
+        files_list = [f for f in listdir(temp_subsubdir) if isfile(join(temp_subsubdir, f))]
+        #print(files_list)
+        for item in tqdm(files_list, leave=False):
+            input_file = temp_subsubdir + "/" + item
+            #print(input_file)
+            temp = get_numpy_from_file(input_file)
+            temp = np.expand_dims(temp, axis=0)
+            if i in test_set:
+                complete_test = np.concatenate((complete_test, temp), axis=0)
+            else:
+                complete_train = np.concatenate((complete_train, temp), axis=0)
+            tot += 1 
+    i += 1
+
+print(f"Finish: shape of train is {complete_train.shape} final shape is ")
+complete_train = complete_train[1:, :, :]
+print(complete_train.shape)
+
+print(f"Finish: shape of test is {complete_test.shape} final shape is ")
+complete_test = complete_test[1:, :, :]
+print(complete_test.shape)
+
+print(f"Total number of meshes considered is: {tot}")
+
+#print(f"Finish: temp shape is {complete.shape}, final shape is: ")
+#complete = complete[1:, :, :]
+#print(complete.shape)
+
+with open("train.npy", 'wb') as file:
+    np.save(file, complete_train)
+
+with open("test.npy", 'wb') as file:
+    np.save(file, complete_test)
+
+
+
+'''
+files_list = [f for f in listdir(directory) if isfile(join(directory, f))]
+print(files_list)
+
+input_file = directory + "/" + files_list[0]
+complete = get_numpy_from_file(input_file)
+complete = np.expand_dims(complete, axis=0)
+print(complete.shape)
+files_list.pop(0) # ATTENZIONE, NON USARE PIU' QUESTA LISTA PERCHE' IL PRIMO ELEMENTO VIENE DISTRUTTO (poco elegante ma pragmatico)
+
+for item in subdir_list:
+    input_file = directory + "/" + item
+    print(input_file)
+    #temp = get_numpy_from_file(input_file)
+    #temp = np.expand_dims(temp, axis=0)
+    #complete = np.concatenate((complete, temp), axis=0)
+
+with open("train.npy", 'wb') as file:
+    np.save(file, complete)
+'''
+# test
+# data = np.load('train.npy')
+# print(data.shape)
