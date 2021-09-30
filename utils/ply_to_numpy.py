@@ -1,3 +1,9 @@
+############################
+'''
+Funziona solo con il dataset COMA ad ora, è sufficiente cambiare il valore della variabile test_set, che contiene
+gli indici dei volti che vogliamo come test.
+'''
+
 from os import listdir
 from os.path import isfile, join
 
