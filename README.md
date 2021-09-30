@@ -17,6 +17,20 @@ Per avviare:
 - `python create_downsampling_matrices --dict path_to_dict_path_json` // se eseguito in locale per Chiara e Niki - usare il file con wls
 - `python main.py ...`
 
+# Su Yoda
+- Crea root_dir ! (nell'esempio 'prova1')
+
+- `python init.py --root_dir /home/egrappolini/CG3D/prova1 --bool 0`
+
+- `python init.py --root_dir /home/egrappolini/CG3D/prova1 --bool 1`
+
+- `python create_downsampling_matrices.py --dict /home/egrappolini/CG3D/prova1/dict_path.json`
+
+### train
+- `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --epochs 500`
+### test
+- `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --mode 'test' --checkpoint_file /home/egrappolini/CG3D/prova1/results/spirals_\ autoencoder/checkpoint490`
+
 -------------------------------------------
 ![Neural3DMM architecture](images/architecture_figure1.png "Neural3DMM architecture")
 
