@@ -15,8 +15,8 @@ step_sizes = [2, 2, 1, 1, 1]
 #filter_sizes_enc = '[[3, 16, 32, 64, 128], [[], [], [], [], []]]'
 #filter_sizes_dec = '[[128, 64, 32, 32, 16], [[], [], [], [], 3]]'
 
-f_sizes_enc = [3, 16, 32, 64, 128]
-f_sizes_dec = [128, 64, 32, 32, 16]
+f_sizes_enc_list = '[3, 16, 32, 64, 128]'
+f_sizes_dec_list = '[128, 64, 32, 32, 16]'
 dilation_flag = True
 if dilation_flag:
     dilation = [2, 2, 1, 1, 1]
@@ -36,9 +36,9 @@ def main():
     parser.add_argument("--epochs", dest="epochs", default=300, help="Number of epochs")
     parser.add_argument("--eval_f", dest="eval_frequency", default=200, help="Eval frequency")
     parser.add_argument("--num_w", dest="num_workers", default=4, help="Number of workers")
-    parser.add_argument("--filter_s_enc", dest="filter_sizes_enc", default=f_sizes_enc,
+    parser.add_argument("--filter_s_enc", dest="filter_sizes_enc", default=f_sizes_enc_list,
                         help="Sizes of filter encoder")
-    parser.add_argument("--filter_s_dec", dest="filter_sizes_dec", default=f_sizes_dec,
+    parser.add_argument("--filter_s_dec", dest="filter_sizes_dec", default=f_sizes_dec_list,
                         help="Sizes of filter decoder")
     parser.add_argument("--nz", dest="nz", default=16, help="Nz")
     parser.add_argument("--ds_factors", dest="ds_factors", default=ds_factors, help="ds_factors")
@@ -57,7 +57,8 @@ def main():
     parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")
 
     args = parser.parse_args()
-
+    f_sizes_enc = np.array(f_sizes_enc_list)
+    f_sizes_dec = np.array(f_sizes_dec_list)
 
     filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3], f_sizes_enc[4]], [[], [], [], [], []]]
     filter_size_dec = [[f_sizes_enc[4], f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[2], f_sizes_enc[1]], [[], [], [], [], f_sizes_enc[0]]]
