@@ -37,9 +37,9 @@ def main():
     parser.add_argument("--eval_f", dest="eval_frequency", default=200, help="Eval frequency")
     parser.add_argument("--num_w", dest="num_workers", default=4, help="Number of workers")
     parser.add_argument("--filter_s_enc", dest="filter_sizes_enc", default=f_sizes_enc_list,
-                        help="Sizes of filter encoder")
+                        help="Sizes of filter encoder", type=list,)
     parser.add_argument("--filter_s_dec", dest="filter_sizes_dec", default=f_sizes_dec_list,
-                        help="Sizes of filter decoder")
+                        help="Sizes of filter decoder", type=list,)
     parser.add_argument("--nz", dest="nz", default=16, help="Nz")
     parser.add_argument("--ds_factors", dest="ds_factors", default=ds_factors, help="ds_factors")
     parser.add_argument("--step_sizes", dest="step_sizes", default=step_sizes, help="step_sizes")
