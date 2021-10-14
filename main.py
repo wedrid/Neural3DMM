@@ -12,8 +12,8 @@ import json
 
 ds_factors = [4, 4, 4, 4]
 step_sizes = [2, 2, 1, 1, 1]
-filter_sizes_enc = [[3, 16, 32, 64, 128], [[], [], [], [], []]]
-filter_sizes_dec = [[128, 64, 32, 32, 16], [[], [], [], [], 3]]
+filter_sizes_enc = '[[3, 16, 32, 64, 128], [[], [], [], [], []]]'
+filter_sizes_dec = '[[128, 64, 32, 32, 16], [[], [], [], [], 3]]'
 dilation_flag = True
 if dilation_flag:
     dilation = [2, 2, 1, 1, 1]
@@ -54,6 +54,9 @@ def main():
     parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")
 
     args = parser.parse_args()
+
+    filter_size_enc = np.array(args.filter_sizes_enc)
+    filter_size_dec = np.array(args.filter_sizes_dec)
 
     with open(args.dict_path) as json_file:
         dict_path = json.load(json_file)
@@ -104,8 +107,8 @@ def main():
                                      shuffle=False, num_workers=args.num_workers)
 
         if 'autoencoder' in dict_path['generative_model']:
-            model = SpiralAutoencoder(filters_enc=args.filter_sizes_enc,
-                                      filters_dec=args.filter_sizes_dec,
+            model = SpiralAutoencoder(filters_enc=filter_size_enc,
+                                      filters_dec=filter_size_dec,
                                       latent_size=args.nz,
                                       sizes=sizes,
                                       spiral_sizes=spiral_sizes,
