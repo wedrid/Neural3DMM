@@ -33,7 +33,7 @@ test_set = {9, 10, 11}
 num_individui = 12 #indici vanno da 0 a 11 #questo è possibile ricavarlo..... 
 # -------- end args
 
-directory = "./COMA_data_nasi"
+directory = "./../../../COMA_data"
 total_set = set(range(12))
 
 train_set = total_set - test_set
@@ -89,10 +89,10 @@ print(f"Total number of meshes considered is: {tot}")
 #complete = complete[1:, :, :]
 #print(complete.shape)
 
-with open("train.npy", 'wb') as file:
+with open("train_volti.npy", 'wb') as file:
     np.save(file, complete_train)
 
-with open("test.npy", 'wb') as file:
+with open("test_volti.npy", 'wb') as file:
     np.save(file, complete_test)
 
 

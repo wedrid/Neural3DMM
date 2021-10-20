@@ -16,12 +16,12 @@ def get_numpy_from_file(input_file):
     #print(numpy_point_cloud.shape)
     return numpy_point_cloud
 
-input_file = "./predictions.npy"
+input_file = "./predictions_filtri_coma.npy"
 
 pred_tensor = np.load(input_file)
 print(f"Dimensione tensore {pred_tensor.shape}")
 
-una_pred = pred_tensor[0,:,:]
+una_pred = pred_tensor[1,:,:]
 print(una_pred.shape)
 
 pcd = o3d.geometry.PointCloud()
