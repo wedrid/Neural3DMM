@@ -22,6 +22,7 @@ if dilation_flag:
     dilation = [2, 2, 1, 1, 1]
 else:
     dilation = None
+#FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? 
 reference_points = [[414]]  # [[3567,4051,4597]] used for COMA with 3 disconnected components
 
 
