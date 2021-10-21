@@ -15,15 +15,30 @@ step_sizes = [2, 2, 1, 1, 1]
 #filter_sizes_enc = '[[3, 16, 32, 64, 128], [[], [], [], [], []]]'
 #filter_sizes_dec = '[[128, 64, 32, 32, 16], [[], [], [], [], 3]]'
 
-f_sizes_enc_list = list([3, 16, 32, 64, 128])
-f_sizes_dec_list = list([128, 64, 32, 32, 16])
+# f_sizes_enc_list = list([3, 16, 32, 64, 128])
+# f_sizes_dec_list = list([128, 64, 32, 32, 16])
+
+# without 3
+
+#
+# filter_sizes_enc = [[64, 64, 64, 128], [[],[],[],[]]]
+# filter_sizes_dec = [[128, 64, 64, 64], [[],[],[],[]]]
+
+# DFAUST
+# f_sizes_enc_list = list([16, 32, 64, 128])
+# f_sizes_dec_list = list([128, 64, 32, 32, 16])
+
+# COMA
+f_sizes_enc_list = list([64, 64, 64, 128])
+f_sizes_dec_list = list([128, 64, 64, 64])
+
 dilation_flag = True
 if dilation_flag:
     dilation = [2, 2, 1, 1, 1]
 else:
     dilation = None
-#FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? 
-reference_points = [[414]]  # [[3567,4051,4597]] used for COMA with 3 disconnected components
+#FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
+reference_points = [[450]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
 
 
 def main():
@@ -61,8 +76,13 @@ def main():
     f_sizes_enc = np.array(f_sizes_enc_list)
     f_sizes_dec = np.array(f_sizes_dec_list)
 
-    filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3], f_sizes_enc[4]], [[], [], [], [], []]]
-    filter_size_dec = [[f_sizes_enc[4], f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[2], f_sizes_enc[1]], [[], [], [], [], f_sizes_enc[0]]]
+    # filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3], f_sizes_enc[4]], [[], [], [], [], []]]
+    # filter_size_dec = [[f_sizes_enc[4], f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[2], f_sizes_enc[1]], [[], [], [], [], f_sizes_enc[0]]]
+
+    filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3]],
+                       [[], [], [], []]]
+    filter_size_dec = [[f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[1], f_sizes_enc[0]],
+                       [[], [], [], []]]
 
     with open(args.dict_path) as json_file:
         dict_path = json.load(json_file)
