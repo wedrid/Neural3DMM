@@ -29,7 +29,7 @@ Per avviare:
 ### train
 - `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --epochs 500`
 ### test
-- `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --mode 'test' --checkpoint_file /home/egrappolini/CG3D/prova1/results/spirals_\ autoencoder/checkpoint490`
+- `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --mode 'test' --checkpoint_file /home/egrappolini/CG3D/prova1/results/spirals_\ autoencoder/checkpoints/checkpoint490`
 
 -------------------------------------------
 ![Neural3DMM architecture](images/architecture_figure1.png "Neural3DMM architecture")
