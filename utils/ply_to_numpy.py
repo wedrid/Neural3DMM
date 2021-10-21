@@ -89,10 +89,10 @@ print(f"Total number of meshes considered is: {tot}")
 #complete = complete[1:, :, :]
 #print(complete.shape)
 
-with open("train.npy", 'wb') as file:
+with open("train_volti.npy", 'wb') as file:
     np.save(file, complete_train)
 
-with open("test.npy", 'wb') as file:
+with open("test_volti.npy", 'wb') as file:
     np.save(file, complete_test)
 
 

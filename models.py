@@ -58,16 +58,16 @@ class SpiralAutoencoder(nn.Module):
         self.spirals = spirals
         self.filters_enc = filters_enc
         self.filters_dec = filters_dec
-        self.spiral_sizes = spiral_sizes
+        self.spiral_sizes = spiral_sizes #Sembra essere una cosa che comunque calcola da se ed è in mean.npy
         self.D = D
         self.U = U
         self.device = device
         self.activation = activation
 
         self.conv = []
-        input_size = filters_enc[0][0]
+        input_size = filters_enc[0][0] #FIXME qui è dove viene usato quel tre è la prima volta
         for i in range(len(spiral_sizes) - 1):
-            if filters_enc[1][i]:
+            if filters_enc[1][i]: #FIXME   
                 self.conv.append(SpiralConv(input_size, spiral_sizes[i], filters_enc[1][i],
                                             activation=self.activation, device=device).to(device))
                 input_size = filters_enc[1][i]
@@ -82,7 +82,7 @@ class SpiralAutoencoder(nn.Module):
         self.fc_latent_dec = nn.Linear(latent_size, (sizes[-1] + 1) * filters_dec[0][0])
 
         self.dconv = []
-        input_size = filters_dec[0][0]
+        input_size = filters_dec[0][0] #FIXME perchè prende lo [0,0]? Non dovrebbe essere [-1,-1] o una cosa del genere?
         for i in range(len(spiral_sizes) - 1):
             if i != len(spiral_sizes) - 2:
                 self.dconv.append(SpiralConv(input_size, spiral_sizes[-2 - i], filters_dec[0][i + 1],
