@@ -29,11 +29,11 @@ def get_numpy_from_file(input_file):
 # ------ args: 
 # TODO da convertire in args o da cacolare....
 train_pct = None
-test_set = {9, 10, 11}
+test_set = {0, 1, 2}
 num_individui = 12 #indici vanno da 0 a 11 #questo è possibile ricavarlo..... 
 # -------- end args
 
-directory = "./COMA_data_nasi"
+directory = "../../COMA_data_noses"
 total_set = set(range(12))
 
 train_set = total_set - test_set
