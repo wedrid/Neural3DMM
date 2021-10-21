@@ -73,15 +73,15 @@ def main():
     parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")
 
     args = parser.parse_args()
-    f_sizes_enc = np.array(f_sizes_enc_list)
-    f_sizes_dec = np.array(f_sizes_dec_list)
+    f_sizes_enc = np.array(args.filter_sizes_enc)
+    f_sizes_dec = np.array(args.filter_sizes_dec)
 
     # filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3], f_sizes_enc[4]], [[], [], [], [], []]]
     # filter_size_dec = [[f_sizes_enc[4], f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[2], f_sizes_enc[1]], [[], [], [], [], f_sizes_enc[0]]]
 
     filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3]],
                        [[], [], [], []]]
-    filter_size_dec = [[f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[1], f_sizes_enc[0]],
+    filter_size_dec = [[f_sizes_dec[0], f_sizes_dec[1], f_sizes_dec[2], f_sizes_dec[3]],
                        [[], [], [], []]]
 
     with open(args.dict_path) as json_file:
