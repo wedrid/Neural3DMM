@@ -38,7 +38,7 @@ if dilation_flag:
 else:
     dilation = None
 #FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
-reference_points = [[450]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
+reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
 
 
 def main():
@@ -84,7 +84,10 @@ def main():
                        [[], [], [], []]]
     filter_size_dec = [[f_sizes_dec[0], f_sizes_dec[1], f_sizes_dec[2], f_sizes_dec[3]],
                        [[], [], [], []]]
-
+    #filter_size_enc = [[3, 16, 32, 64, 128], [[], [], [], [], []]]
+    #filter_size_dec = [[128, 64, 32, 32, 16], [[], [], [], [], 3]]
+    filter_size_enc = [[64, 64, 64, 128], [[],[],[],[]]]
+    filter_size_dec = [[128, 64, 64, 64], [[],[],[],[]]]
     with open(args.dict_path) as json_file:
         dict_path = json.load(json_file)
 
