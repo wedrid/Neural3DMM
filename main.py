@@ -12,8 +12,8 @@ import json
 
 ds_factors = [4, 4, 4, 4]
 step_sizes = [2, 2, 1, 1, 1]
-#filter_sizes_enc = '[[3, 16, 32, 64, 128], [[], [], [], [], []]]'
-#filter_sizes_dec = '[[128, 64, 32, 32, 16], [[], [], [], [], 3]]'
+filter_size_enc = [[3, 16, 32, 64, 128], [[], [], [], [], []]]
+filter_size_dec = [[128, 64, 32, 32, 16], [[], [], [], [], 3]]
 
 # f_sizes_enc_list = list([3, 16, 32, 64, 128])
 # f_sizes_dec_list = list([128, 64, 32, 32, 16])
@@ -29,8 +29,8 @@ step_sizes = [2, 2, 1, 1, 1]
 # f_sizes_dec_list = list([128, 64, 32, 32, 16])
 
 # COMA
-f_sizes_enc_list = list([64, 64, 64, 128])
-f_sizes_dec_list = list([128, 64, 64, 64])
+# f_sizes_enc_list = list([64, 64, 64, 128])
+# f_sizes_dec_list = list([128, 64, 64, 64])
 
 dilation_flag = True
 if dilation_flag:
@@ -53,10 +53,10 @@ def main():
     parser.add_argument("--eval_f", dest="eval_frequency", default=200, help="Eval frequency")
     parser.add_argument("--num_w", dest="num_workers", default=4, help="Number of workers")
     # pause
-    parser.add_argument("--filter_s_enc", dest="filter_sizes_enc", default=f_sizes_enc_list,
-                        help="Sizes of filter encoder", type=list)
-    parser.add_argument("--filter_s_dec", dest="filter_sizes_dec", default=f_sizes_dec_list,
-                        help="Sizes of filter decoder", type=list)
+    # parser.add_argument("--filter_s_enc", dest="filter_sizes_enc", default=f_sizes_enc_list,
+    #                     help="Sizes of filter encoder", type=list)
+    # parser.add_argument("--filter_s_dec", dest="filter_sizes_dec", default=f_sizes_dec_list,
+    #                     help="Sizes of filter decoder", type=list)
     parser.add_argument("--nz", dest="nz", default=16, help="Nz")
     parser.add_argument("--ds_factors", dest="ds_factors", default=ds_factors, help="ds_factors")
     parser.add_argument("--step_sizes", dest="step_sizes", default=step_sizes, help="step_sizes")
@@ -74,20 +74,18 @@ def main():
     parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")
 
     args = parser.parse_args()
-    f_sizes_enc = np.array(args.filter_sizes_enc)
-    f_sizes_dec = np.array(args.filter_sizes_dec)
+    # f_sizes_enc = np.array(args.filter_sizes_enc)
+    # f_sizes_dec = np.array(args.filter_sizes_dec)
 
     # filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3], f_sizes_enc[4]], [[], [], [], [], []]]
     # filter_size_dec = [[f_sizes_enc[4], f_sizes_enc[3], f_sizes_enc[2], f_sizes_enc[2], f_sizes_enc[1]], [[], [], [], [], f_sizes_enc[0]]]
 
-    filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3]],
-                       [[], [], [], []]]
-    filter_size_dec = [[f_sizes_dec[0], f_sizes_dec[1], f_sizes_dec[2], f_sizes_dec[3]],
-                       [[], [], [], []]]
-    #filter_size_enc = [[3, 16, 32, 64, 128], [[], [], [], [], []]]
-    #filter_size_dec = [[128, 64, 32, 32, 16], [[], [], [], [], 3]]
-    filter_size_enc = [[64, 64, 64, 128], [[],[],[],[]]]
-    filter_size_dec = [[128, 64, 64, 64], [[],[],[],[]]]
+    # filter_size_enc = [[f_sizes_enc[0], f_sizes_enc[1], f_sizes_enc[2], f_sizes_enc[3]],
+    #                    [[], [], [], []]]
+    # filter_size_dec = [[f_sizes_dec[0], f_sizes_dec[1], f_sizes_dec[2], f_sizes_dec[3]],
+    #                    [[], [], [], []]]
+
+
     with open(args.dict_path) as json_file:
         dict_path = json.load(json_file)
 

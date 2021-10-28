@@ -10,9 +10,10 @@ def test(model, device, args, dict_path, dataloader_test, shapedata):
                                  map_location=device)
     model.load_state_dict(checkpoint_dict['autoencoder_state_dict'])
 
-    predictions, norm_l1_loss, l2_loss = test_autoencoder_dataloader(device, model, dataloader_test,
+    predictions, testset, norm_l1_loss, l2_loss = test_autoencoder_dataloader(device, model, dataloader_test,
                                                                      shapedata, mm_constant=1000)
     np.save(os.path.join(dict_path['prediction_path'], 'predictions'), predictions)
+    np.save(os.path.join(dict_path['prediction_path'], 'testset'), testset)
 
     print('autoencoder: normalized loss', norm_l1_loss)
     print('autoencoder: euclidean distance in mm=', l2_loss)
