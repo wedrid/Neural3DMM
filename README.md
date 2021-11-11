@@ -31,6 +31,12 @@ Per avviare:
 ### test
 - `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --mode 'test' --checkpoint_file /home/egrappolini/CG3D/prova1/results/spirals_\ autoencoder/checkpoints/checkpoint490`
 
+======== 
+Comando per avviare model_extraction.py
+python model_extraction.py --dict /home/egrappolini/CG3D/filtri_coma/dict_path.json --checkpoint_file checkpoint290
+
+
+
 -------------------------------------------
 ![Neural3DMM architecture](images/architecture_figure1.png "Neural3DMM architecture")
 
