@@ -2,10 +2,14 @@ import numpy as np
 import os
 import torch
 from models import SpiralAutoencoder
+from torch.utils.data import DataLoader
+from autoencoder_dataset import autoencoder_dataset
 import argparse
 import json
 from transform_matrices import matrices_tr
 from torchsummary import summary
+import tqdm
+
 
 ds_factors = [4, 4, 4, 4]
 step_sizes = [2, 2, 1, 1, 1]
@@ -19,6 +23,51 @@ else:
     dilation = None
 #FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
 reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
+
+
+def generate_one_latent_code(device, model, ind, dataloader_test, shapedata, mm_constant=1000):
+    model.eval()
+    l1_loss = 0
+    l2_loss = 0
+    shapedata_mean = torch.Tensor(shapedata.mean).to(device)
+    shapedata_std = torch.Tensor(shapedata.std).to(device)
+
+    with torch.no_grad():
+        for i, sample_dict in enumerate(dataloader_test):
+            if i == 0:
+                tx = sample_dict['points'].to(device)
+                prediction = model(tx)
+                break
+
+            # tx = sample_dict['points'].to(device)
+            # prediction = model(tx)
+            # if i == 0:
+            #     predictions = copy.deepcopy(prediction)
+            #     testset = copy.deepcopy(tx[:, :-1])  # fixed rendering
+            # else:
+            #     predictions = torch.cat([predictions, prediction], 0)
+            #     testset = torch.cat([testset, tx[:, :-1]], 0)  # fixed rendering
+            #
+            # if dataloader_test.dataset.dummy_node:
+            #     x_recon = prediction[:, :-1]
+            #     x = tx[:, :-1]
+            # else:
+            #     x_recon = prediction
+            #     x = tx
+            # l1_loss += torch.mean(torch.abs(x_recon - x)) * x.shape[0] / float(len(dataloader_test.dataset))
+
+            # x_recon = (x_recon * shapedata_std + shapedata_mean) * mm_constant
+            # x = (x * shapedata_std + shapedata_mean) * mm_constant
+            # l2_loss += torch.mean(torch.sqrt(torch.sum((x_recon - x) ** 2, dim=2))) * x.shape[0] / float(
+            #     len(dataloader_test.dataset))
+    #
+    #     testset = (testset * shapedata_std + shapedata_mean) * mm_constant  # fixed rendering
+    #     predictions = predictions.cpu().numpy()
+    #     l1_loss = l1_loss.item()
+    #     l2_loss = l2_loss.item()
+    #
+    # return predictions, testset.cpu().numpy(), l1_loss, l2_loss  # fixed rendering
+    return prediction
 
 
 def main():
@@ -96,10 +145,33 @@ def main():
         #     # if isinstance(layer, torch.nn.Conv2d):
         #     print(name, layer)
 
-        boh = model.fc_latent_enc
-        # print("boh: ", boh)s
-        summary(boh)
-        return boh
+        conv = model.conv   # model.fc_latent_enc
+        # # print("boh: ", boh)s
+        # summary(conv)
+
+        # dataset_test
+        dataset_test = autoencoder_dataset(root_dir=data, points_dataset='test',
+                                           shapedata=shapedata,
+                                           normalization=args.normalization)
+        dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size,
+                                     shuffle=False, num_workers=args.num_workers)
+        # print("dataloader test: ", dataloader_test)
+        # test_iter = iter(dataloader_test)
+        # out, out1 = next(test_iter)
+        # print(out)
+        pred = generate_one_latent_code(device, conv, 0, dataloader_test, shapedata)
+
+        return pred
+
+        # prendere un elemento
+
+
+        # fc_latent_enc = model.fc_latent_enc
+        #
+        # out_conv = conv('./TMP/template.obj')
+        # out_encoded = fc_latent_enc(out_conv)
+
+        # return out_encoded
 
         # python model_extraction.py --dict
         # C:/Users/chiar/PycharmProjects/Neural3DMM_noses/TMP/dict_path.json --checkpoint_file
@@ -107,4 +179,5 @@ def main():
 
 
 if __name__ == '__main__':
-    lc = main()
+    # lc = main()
+    dl = main()
