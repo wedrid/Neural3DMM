@@ -25,7 +25,6 @@ else:
 #FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
 reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
 
-
 def main():
     parser = argparse.ArgumentParser(description="neural 3DMM ...")
     parser.add_argument("--GPU", dest="GPU", default=True, help="GPU is available")
@@ -103,7 +102,7 @@ def main():
 
         # model = model.fc_latent_enc
         # print("boh: ", boh)s
-        summary(model)
+        #summary(model)
         
 
         # python model_extraction.py --dict
@@ -122,9 +121,10 @@ def main():
         subset = torch.utils.data.Subset(dataloader_test, subset_indices)
         testloader_subset = torch.utils.data.DataLoader(subset, batch_size=1, num_workers=0, shuffle=False)
         print(testloader_subset)'''
-        one_data = next(iter(dataloader_test))   
-        print("HELLO")
-        print(one_data)
+        all_data = dataset_test.getWholeProcessedDataset("./data/test.npy")
+        #one_data = next(iter(dataloader_test))   
+        print("")
+        #print(one_data)
 
         model.eval()
         l1_loss = 0
@@ -133,20 +133,27 @@ def main():
         shapedata_mean = torch.Tensor(shapedata.mean).to(device)
         shapedata_std = torch.Tensor(shapedata.std).to(device)
 
-        tx = one_data['points'].to(device)
+        #tx = one_data['points'].to(device)
+        tx = all_data[0:10,:,:].to(device)
+        print("Inside encode")
+        #print(tx)
+        print(tx.size())
         latent_code = model.encode(tx)
         print("LATENT: ")
         #print(latent_code)
         #print(latent_code.shape)
-
+        
         pred = model.decode(latent_code)
         #print("DECODED")
         #print(pred)
         #print(pred.shape)
 
         one_latent_code = latent_code[0]
-        print(one_latent_code)
-        print(one_latent_code.shape)
+        numpy_latents = latent_code.cpu().detach().numpy()
+        print(numpy_latents[0])
+        with open("./data/mylatents.npy", 'wb') as file:
+            np.save(file, numpy_latents)
+        
         '''
         with torch.no_grad():
             for i, sample_dict in enumerate(tqdm(dataloader_test)):
