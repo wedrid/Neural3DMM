@@ -151,6 +151,7 @@ def main():
         one_latent_code = latent_code[0]
         numpy_latents = latent_code.cpu().detach().numpy()
         print(numpy_latents[0])
+        #saves latents
         with open("./data/mylatents.npy", 'wb') as file:
             np.save(file, numpy_latents)
         
