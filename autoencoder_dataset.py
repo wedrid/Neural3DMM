@@ -2,6 +2,17 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 import os
+import platform
+
+
+# per path di windows creati con join che hanno slash \
+def right_slash(path):
+    if platform.system() is 'Windows' and '\\' in path:
+        path = path.replace('\\', '/')
+        # print("Changing '\\' slashes")
+        # print("path traformato: ", path)
+
+    return path
 
 
 class autoencoder_dataset(Dataset):
@@ -13,7 +24,7 @@ class autoencoder_dataset(Dataset):
         self.root_dir = root_dir
         self.points_dataset = points_dataset
         self.dummy_node = dummy_node
-        self.paths = np.load(os.path.join(root_dir, 'paths_'+points_dataset+'.npy'))
+        self.paths = np.load(os.path.join(root_dir, 'paths_'+ points_dataset+'.npy'))
 
     def __len__(self):
         return len(self.paths)
@@ -21,7 +32,7 @@ class autoencoder_dataset(Dataset):
     def __getitem__(self, idx):
         basename = self.paths[idx]
         
-        verts_init = np.load(os.path.join(self.root_dir,'points'+'_'+self.points_dataset, basename+'.npy'))
+        verts_init = np.load(right_slash(os.path.join(self.root_dir, 'points'+'_' + self.points_dataset, basename + '.npy')))
         if self.normalization:
             verts_init = verts_init - self.shapedata.mean
             verts_init = verts_init/self.shapedata.std
