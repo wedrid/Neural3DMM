@@ -106,5 +106,13 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+#data and dataset (edo)
+explore_clusters/data/
+cluster_renderings_hdbscan/
+cluster_renderings_hdbscan/
+renderings/
+dataset_npy/
+clusters_labels/
 
+TMP
 .TMP/
