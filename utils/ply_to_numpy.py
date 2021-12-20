@@ -4,7 +4,7 @@ Funziona solo con il dataset COMA ad ora, è sufficiente cambiare il valore dell
 gli indici dei volti che vogliamo come test.
 '''
 
-from os import listdir
+from os import listdir 
 from os.path import isfile, join
 
 import open3d as o3d

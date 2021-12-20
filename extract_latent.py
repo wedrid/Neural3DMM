@@ -12,6 +12,8 @@ from torchsummary import summary
 from torch.utils.data import Dataset, DataLoader
 from autoencoder_dataset import *
 
+#python extract_latent.py --dict /home/egrappolini/CG3D/filtri_coma/dict_path.json --checkpoint_file checkpoint290
+
 ds_factors = [4, 4, 4, 4]
 step_sizes = [2, 2, 1, 1, 1]
 filter_size_enc = [[3, 16, 32, 64, 128], [[], [], [], [], []]]
@@ -26,6 +28,7 @@ else:
 reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
 
 def main():
+    torch.cuda.empty_cache()
     parser = argparse.ArgumentParser(description="neural 3DMM ...")
     parser.add_argument("--GPU", dest="GPU", default=True, help="GPU is available")
     parser.add_argument("--device", dest="device_idx", default='0', help="choose GPU")
@@ -70,7 +73,8 @@ def main():
         shapedata, sizes, bU, bD, spirals_np, spiral_sizes, spirals = matrices_tr(args, reference_points, dict_path)
         # Model
         torch.manual_seed(args.seed)
-
+        #GPU = False
+        
         if GPU:
             # device = torch.device("cuda:" + str(device_idx) if torch.cuda.is_available() else "cpu")
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -122,6 +126,8 @@ def main():
         testloader_subset = torch.utils.data.DataLoader(subset, batch_size=1, num_workers=0, shuffle=False)
         print(testloader_subset)'''
         all_data = dataset_test.getWholeProcessedDataset("./data/test.npy")
+        #all_data = dataset_test.getWholeProcessedDataset("./data/train.npy")
+
         #one_data = next(iter(dataloader_test))   
         print("")
         #print(one_data)
@@ -134,7 +140,7 @@ def main():
         shapedata_std = torch.Tensor(shapedata.std).to(device)
 
         #tx = one_data['points'].to(device)
-        tx = all_data[0:10,:,:].to(device)
+        tx = all_data[0:,:,:].to(device)
         print("Inside encode")
         #print(tx)
         print(tx.size())
@@ -152,7 +158,7 @@ def main():
         numpy_latents = latent_code.cpu().detach().numpy()
         print(numpy_latents[0])
         #saves latents
-        with open("./data/mylatents.npy", 'wb') as file:
+        with open("./data/test_latents.npy", 'wb') as file:
             np.save(file, numpy_latents)
         
         '''
