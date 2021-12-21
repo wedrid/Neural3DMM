@@ -153,14 +153,26 @@ def main():
     # complete = complete[1:, :, :]
     # print(complete.shape)
 
-    with open("train_nasi.npy", 'wb') as file:
-        np.save(dest_directory + file, complete_train)
+    name_train = dest_directory + "train_nasi_top.npy"
+    name_test = dest_directory + "test_nasi_top.npy"
 
-    with open("test_nasi.npy", 'wb') as file:
-        np.save(dest_directory + file, complete_test)
+    with open(name_train, 'wb') as file:
+        np.save(file, complete_train)
 
-    myMetadata_test.to_csv('test_nasi_metadata.csv')
-    myMetadata_train.to_csv('train_nasi_metadata.csv')
+    with open(name_test, 'wb') as file:
+        np.save(file, complete_test)
+
+    myMetadata_test.to_csv(dest_directory + "test_nasi_top_metadata.csv")
+    myMetadata_train.to_csv(dest_directory + "train_nasi_top_metadata.csv")
+
+    # with open("train_nasi.npy", 'wb') as file:
+    #     np.save(dest_directory + file, complete_train)
+    #
+    # with open("test_nasi.npy", 'wb') as file:
+    #     np.save(dest_directory + file, complete_test)
+
+    # myMetadata_test.to_csv('test_nasi_metadata.csv')
+    # myMetadata_train.to_csv('train_nasi_metadata.csv')
 
 
 if __name__ == '__main__':
