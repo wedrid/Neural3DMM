@@ -1,3 +1,6 @@
+#python3 latent_to_rendering.py --dict ./TMP/dict_path.json --checkpoint_file checkpoint290
+# script can be executed either with or without arguments, in particular init has optional arguments to change dict path and checkpoint.
+
 from random import sample
 import numpy as np
 import os
@@ -12,8 +15,8 @@ import copy
 from torchsummary import summary
 from utils import render_mesh
 import open3d as o3d
+from pathlib import Path
 
-#python3 latent_to_rendering.py --dict ./TMP/dict_path.json --checkpoint_file checkpoint290
 #python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --mode 'test' --checkpoint_file /home/egrappolini/CG3D/prova1/results/spirals_\ autoencoder/checkpoints/checkpoint490
 #python3 latent_to_pointcloud.py --dict ./TMP/dict_path.json --checkpoint_file ./TMP/checkpoints/checkpoint290.pth.tar
 #python3 latent_to_pointcloud.py --dict ./TMP/dict_path.json --checkpoint_file ./TMP/checkpoints/checkpoint290
@@ -51,6 +54,7 @@ def save_predictions(pred_tensor_mod, out_path):
     print(final_preds.shape)
     #render_mesh.render_mesh(one_pred[:-1,:], "./utils/reference_nose_mesh.ply")
     for (i,one_pred) in enumerate(final_preds):
+        Path(out_path).mkdir(parents=True, exist_ok=True)
         render_mesh.save_mesh_img(one_pred[:-1,:], "./utils/reference_nose_mesh.ply", out_path + f"rendering_{i}.png")
     
     
@@ -72,6 +76,8 @@ def render_pred(pred_tensor_mod):
     return
 
 def decode_and_render_latent(latent, model, shapedata_mean, shapedata_std):
+    if latent.ndim == 1: 
+        latent = np.expand_dims(latent, axis=0)
     mm_constant = 1000
     latent = np.expand_dims(latent, axis=0)
     pred = model.decode(torch.tensor(latent))
@@ -79,9 +85,17 @@ def decode_and_render_latent(latent, model, shapedata_mean, shapedata_std):
     pred_tensor_mod = (pred * shapedata_std + shapedata_mean) * mm_constant
     render_pred(pred_tensor_mod) 
 
+def decode_and_save_latent(latent, model, shapedata_mean, shapedata_std, out_path):
+    mm_constant = 1000
+    if latent.ndim == 1: 
+        latent = np.expand_dims(latent, axis=0)
+    pred = model.decode(torch.tensor(latent))
+    pred = pred[:, :-1] #gets rid of dummy node
+    pred_tensor_mod = (pred * shapedata_std + shapedata_mean) * mm_constant
+    save_predictions(pred_tensor_mod, out_path) 
     
 
-def decode_latent_segment(lat1, lat2, step_size, model, shapedata_mean, shapedata_std):
+def decode_latent_segment(lat1, lat2, step_size, model, shapedata_mean, shapedata_std, additional_path = ""):
     assert lat1.ndim == 1
     assert lat2.ndim == 1
     mm_constant = 1000
@@ -109,7 +123,7 @@ def decode_latent_segment(lat1, lat2, step_size, model, shapedata_mean, shapedat
    
     
     latents = np.array(latents)
-    latents = torch.tensor(latents)
+    latents = torch.tensor(latents).float()
     print(f"Segment: {latents}")
 
     if False:
@@ -121,9 +135,9 @@ def decode_latent_segment(lat1, lat2, step_size, model, shapedata_mean, shapedat
     print(pred.shape)
     pred = pred[:, :-1] #gets rid of dummy node
     pred_tensor_mod = (pred * shapedata_std + shapedata_mean) * mm_constant
-    save_predictions(pred_tensor_mod, "./renderings/") 
+    save_predictions(pred_tensor_mod, "./renderings/"+additional_path) 
 
-def main():
+def init(checkpoint = False, dict_path = False):
     parser = argparse.ArgumentParser(description="neural 3DMM ...")
     parser.add_argument("--GPU", dest="GPU", default=True, help="GPU is available")
     parser.add_argument("--device", dest="device_idx", default='0', help="choose GPU")
@@ -152,11 +166,13 @@ def main():
     parser.add_argument("--mode", dest="mode", default='train', help="Mode")
     parser.add_argument("--shuffle", dest="shuffle", default=True, help="Shuffle")
     parser.add_argument("--normalization", dest="normalization", default=True, help="Normalization")
-    parser.add_argument("--checkpoint_file", dest="checkpoint_file", default='checkpoint', help="checkpoint_file")
-    parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")
+    parser.add_argument("--checkpoint_file", dest="checkpoint_file", default=checkpoint, help="checkpoint_file")
+    #if not specified, takes in the argument of the function
+    parser.add_argument("--dict", dest="dict_path", default=dict_path, help="Path to the json file containing dict_path")
 
 
     args = parser.parse_args()
+    print(args.GPU)
 
     with open(args.dict_path) as json_file:
         dict_path = json.load(json_file)
@@ -195,45 +211,50 @@ def main():
         print("")
 
         model.eval()
-        l1_loss = 0
-        l2_loss = 0
         mm_constant=1000
 
         shapedata_mean = torch.Tensor(shapedata.mean).to(device)
         shapedata_std = torch.Tensor(shapedata.std).to(device)
 
+        return (model, shapedata_mean, shapedata_std)
+
         #tx = one_data['points'].to(device)
+    else:
+        return False
+
+def main():
+    model, shapedata_mean, shapedata_std = init(dict_path="./TMP/dict_path.json", checkpoint="checkpoint290")
+    print("LATENT: ")
+    latents = np.load("mylatents.npy")
+    print(latents.shape)
+    norms = []
+    for item in latents:
+        norms.append(np.linalg.norm(item))
+    norms = np.array(norms)
+    print(f"Min: {norms[np.argmin(norms)]}, Max: {norms[np.argmax(norms)]}")
+    #latents = torch.tensor(latents[4000:4010,:])
+    decode_latent_segment(latents[np.argmax(norms)], latents[np.argmin(norms)], 3, model, shapedata_mean, shapedata_std)
+    #decode_latent_segment(latents[0], latents[500], 3, model, shapedata_mean, shapedata_std)
+    
+    #decode_and_render_latent(torch.zeros(16)+10, model, shapedata_mean, shapedata_std)
+    #decode_and_render_latent(latents[120], model, shapedata_mean, shapedata_std)
+    #decode_and_render_latent(latents[0], model, shapedata_mean, shapedata_std)
+
+    return 
+    latents = torch.tensor(latents[1000:1005,:])
+    print(f"SHAPEH LATENTS: {latents.size()}")
+
+    if False:
+        latents = (np.random.rand(10,16) + 20)
+        latents = torch.tensor(latents).float()
         
-        print("LATENT: ")
-        latents = np.load("mylatents.npy")
-        print(latents.shape)
-        norms = []
-        for item in latents:
-            norms.append(np.linalg.norm(item))
-        norms = np.array(norms)
-        print(f"Min: {norms[np.argmin(norms)]}, Max: {norms[np.argmax(norms)]}")
-        #latents = torch.tensor(latents[4000:4010,:])
-        #decode_latent_segment(latents[np.argmax(norms)], latents[np.argmin(norms)], 3, model, shapedata_mean, shapedata_std)
-        decode_latent_segment(latents[0], latents[4000], 3, model, shapedata_mean, shapedata_std)
-        decode_and_render_latent(latents[120], model, shapedata_mean, shapedata_std)
-        decode_and_render_latent(latents[0], model, shapedata_mean, shapedata_std)
-
-
-        return 
-        latents = torch.tensor(latents[1000:1005,:])
-        print(f"SHAPEH LATENTS: {latents.size()}")
-
-        if False:
-            latents = (np.random.rand(10,16) + 20)
-            latents = torch.tensor(latents).float()
-            
-        pred = model.decode(latents)
-        print("DECODED")
-        print(pred.shape)
-        pred = pred[:, :-1]
-        pred_tensor_mod = (pred * shapedata_std + shapedata_mean) * mm_constant
-        save_predictions(pred_tensor_mod, "./renderings/") 
-        return
+    pred = model.decode(latents)
+    print("DECODED")
+    print(pred.shape)
+    pred = pred[:, :-1]
+    pred_tensor_mod = (pred * shapedata_std + shapedata_mean) * mm_constant
+    save_predictions(pred_tensor_mod, "./renderings/") 
+    return
  
 
 if __name__ == '__main__':

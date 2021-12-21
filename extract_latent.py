@@ -60,10 +60,12 @@ def main():
 
     args = parser.parse_args()
 
+    train_test = "train"
+
     with open(args.dict_path) as json_file:
         dict_path = json.load(json_file)
 
-    GPU = args.GPU
+    GPU = False
     data = dict_path['data']
     if os.path.exists(data + '/mean.npy') or not os.path.exists(data + '/std.npy'):
         np.random.seed(args.seed)
@@ -94,7 +96,7 @@ def main():
         checkpoint_dict = torch.load(os.path.join(dict_path['checkpoint_path'], args.checkpoint_file + '.pth.tar'),
                                          map_location=device)
         model.load_state_dict(checkpoint_dict['autoencoder_state_dict'])
-        summary(model)
+        #summary(model)
         # print(model)
         # for name, layer in model.named_modules():
         #     # if isinstance(layer, torch.nn.Conv2d):
@@ -108,7 +110,7 @@ def main():
         # python model_extraction.py --dict
         # C:/Users/chiar/PycharmProjects/Neural3DMM_noses/TMP/dict_path.json --checkpoint_file
         # C:/Users/chiar/PycharmProjects/Neural3DMM_noses/TMP/checkpoints/checkpoint290
-        dataset_test = autoencoder_dataset(root_dir=data, points_dataset='test',
+        dataset_test = autoencoder_dataset(root_dir=data, points_dataset="test",
                                            shapedata=shapedata,
                                            normalization=args.normalization)
 
@@ -121,7 +123,9 @@ def main():
         subset = torch.utils.data.Subset(dataloader_test, subset_indices)
         testloader_subset = torch.utils.data.DataLoader(subset, batch_size=1, num_workers=0, shuffle=False)
         print(testloader_subset)'''
-        all_data = dataset_test.getWholeProcessedDataset("./data/test.npy")
+        all_data = dataset_test.getWholeProcessedDataset("./explore_clusters/good_data/train_nasi.npy")
+
+        #all_data = dataset_test.getWholeProcessedDataset(f"./dataset_npy/{train_test}.npy")
         #one_data = next(iter(dataloader_test))   
         print("")
         #print(one_data)
@@ -134,7 +138,7 @@ def main():
         shapedata_std = torch.Tensor(shapedata.std).to(device)
 
         #tx = one_data['points'].to(device)
-        tx = all_data[0:10,:,:].to(device)
+        tx = all_data[:,:,:].to(device)
         print("Inside encode")
         #print(tx)
         print(tx.size())
@@ -152,7 +156,7 @@ def main():
         numpy_latents = latent_code.cpu().detach().numpy()
         print(numpy_latents[0])
         #saves latents
-        with open("./data/mylatents.npy", 'wb') as file:
+        with open(f"./explore_clusters/train_nasi_latents.npy", 'wb') as file:
             np.save(file, numpy_latents)
         
         '''
