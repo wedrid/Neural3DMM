@@ -86,9 +86,19 @@ def main():
 
     print("SHAPE")
     print(complete_train.shape)
+
+    tests = ['FaceTalk_170731_00024_TA', 'FaceTalk_170904_00128_TA', 'FaceTalk_170811_03275_TA']
+    test_flag = False
     for subdir in tqdm(subdir_list):
         # print(f"Iteration {i} of {len(subdir_list)}")
         # print(subdir)
+        
+        if subdir in tests:
+            print(f"Subdir {subdir} is in test")
+            test_flag = True
+        else:
+            print(f"Subdir {subdir} is in train")
+            test_flag = False
         temp_subdir = directory + "/" + subdir
         subsubdir_list = [f for f in sorted(listdir(temp_subdir)) if not isfile(join(temp_subdir, f))]
         for subsubdir in tqdm(subsubdir_list, leave=False):
@@ -101,7 +111,7 @@ def main():
                 # print(input_file)
                 temp = get_numpy_from_file(input_file)
                 temp = np.expand_dims(temp, axis=0)
-                if i in test_set:
+                if test_flag:
                     complete_test = np.concatenate((complete_test, temp), axis=0)
                     individuals_test.append(i)
                     expressions_test.append(expr_dict[subsubdir])
