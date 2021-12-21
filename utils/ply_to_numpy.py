@@ -40,7 +40,7 @@ def main():
     la parte alta dei nasi. per il resto tutto dovrebbe essere uguale'''
 
     # directory = "../../COMA_data_noses"
-    directory = "../../COMA_data_noses_TOP"
+    directory = "/home/egrappolini/CG3D/COMA_data_noses_TOP"
 
     dest_directory = "/home/egrappolini/CG3D/Neural3DMM/data/parte_alta_nasi_COMA/"
 
