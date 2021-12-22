@@ -13,6 +13,7 @@ from torch.utils.data import Dataset, DataLoader
 from autoencoder_dataset import *
 
 #python extract_latent.py --dict /home/egrappolini/CG3D/filtri_coma/dict_path.json --checkpoint_file checkpoint290
+#python3 extract_latent.py --dict ./trained_models/filtri_coma_TOP/dict_path.json --checkpoint_file checkpoint290
 
 ds_factors = [4, 4, 4, 4]
 step_sizes = [2, 2, 1, 1, 1]
@@ -26,6 +27,7 @@ else:
     dilation = None
 #FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
 reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
+#162 per più piccolo
 
 def main():
     torch.cuda.empty_cache()
@@ -114,7 +116,7 @@ def main():
         # python model_extraction.py --dict
         # C:/Users/chiar/PycharmProjects/Neural3DMM_noses/TMP/dict_path.json --checkpoint_file
         # C:/Users/chiar/PycharmProjects/Neural3DMM_noses/TMP/checkpoints/checkpoint290
-        dataset_test = autoencoder_dataset(root_dir=data, points_dataset="test",
+        dataset_test = autoencoder_dataset(root_dir=data, points_dataset="test", #miao
                                            shapedata=shapedata,
                                            normalization=args.normalization)
 
@@ -127,15 +129,9 @@ def main():
         subset = torch.utils.data.Subset(dataloader_test, subset_indices)
         testloader_subset = torch.utils.data.DataLoader(subset, batch_size=1, num_workers=0, shuffle=False)
         print(testloader_subset)'''
-<<<<<<< HEAD
-        all_data = dataset_test.getWholeProcessedDataset("./explore_clusters/good_data/train_nasi.npy")
+        all_data = dataset_test.getWholeProcessedDataset("./trained_models/new_dataset/preprocessed/test.npy")
 
         #all_data = dataset_test.getWholeProcessedDataset(f"./dataset_npy/{train_test}.npy")
-=======
-        all_data = dataset_test.getWholeProcessedDataset("./data/test.npy")
-        #all_data = dataset_test.getWholeProcessedDataset("./data/train.npy")
-
->>>>>>> f41cc950db4bea4656fa79448db50f554a301d94
         #one_data = next(iter(dataloader_test))   
         print("")
         #print(one_data)
@@ -148,11 +144,7 @@ def main():
         shapedata_std = torch.Tensor(shapedata.std).to(device)
 
         #tx = one_data['points'].to(device)
-<<<<<<< HEAD
         tx = all_data[:,:,:].to(device)
-=======
-        tx = all_data[0:,:,:].to(device)
->>>>>>> f41cc950db4bea4656fa79448db50f554a301d94
         print("Inside encode")
         #print(tx)
         print(tx.size())
@@ -161,7 +153,7 @@ def main():
         #print(latent_code)
         #print(latent_code.shape)
         
-        pred = model.decode(latent_code)
+        #pred = model.decode(latent_code)
         #print("DECODED")
         #print(pred)
         #print(pred.shape)
@@ -170,11 +162,7 @@ def main():
         numpy_latents = latent_code.cpu().detach().numpy()
         print(numpy_latents[0])
         #saves latents
-<<<<<<< HEAD
-        with open(f"./explore_clusters/train_nasi_latents.npy", 'wb') as file:
-=======
-        with open("./data/test_latents.npy", 'wb') as file:
->>>>>>> f41cc950db4bea4656fa79448db50f554a301d94
+        with open("./latents/latents_COMA_top/test_newdataset_latents.npy", 'wb') as file:
             np.save(file, numpy_latents)
         
         '''

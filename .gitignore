@@ -107,6 +107,7 @@ venv.bak/
 .mypy_cache/
 
 #data and dataset (edo)
+trained_models/
 explore_clusters/data/
 cluster_renderings_hdbscan/
 cluster_renderings_hdbscan/
@@ -118,3 +119,4 @@ TMP
 .TMP/
 explore_clusters/.DS_Store
 utils/.DS_Store
+
