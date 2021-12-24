@@ -3,20 +3,10 @@ from os.path import isfile, join
 import numpy as np
 import pandas as pd
 
-from ply_to_numpy import get_numpy_from_file
+from ply_to_numpy import get_numpy_from_file, right_slash
 import argparse
 import os
 import platform
-
-
-# per path di windows creati con join che hanno slash \
-def right_slash(path):
-    if platform.system() == 'Windows' and '\\' in path:
-        path = path.replace('\\', '/')
-        # print("Changing '\\' slashes")
-        # print("path traformato: ", path)
-
-    return path
 
 
 def get_heading(filename):
@@ -78,7 +68,7 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
         # mi prendo le mesh corrispondenti agli indici che ho creato
         # controllando le intestazioni
 
-        for k in range(10):  # range(len(files)):  # ciclo su files
+        for k in range(len(files)):  # ciclo su files
             f = get_heading(files[k])
 
             name_file = temp_subdir + "/" + files[k]
@@ -122,16 +112,21 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
         }
     )
 
-    name_train = "train_" + dest_filename + ".npy"
-    name_test = "test_" + dest_filename + ".npy"
-    csv_train = "train_" + dest_filename + "_metadata.csv"
-    csv_test = "test_" + dest_filename + "_metadata.csv"
+    name_train = dest_directory + "train_" + dest_filename + ".npy"
+    name_test = dest_directory + "test_" + dest_filename + ".npy"
+    csv_train = dest_directory + "train_" + dest_filename + "_metadata.csv"
+    csv_test = dest_directory + "test_" + dest_filename + "_metadata.csv"
 
-    if platform.system() != 'Windows':
-        name_train = dest_directory + name_train
-        name_test = dest_directory + name_test
-        csv_train = dest_directory + csv_train
-        csv_test = dest_directory + csv_test
+    # name_train = "train_" + dest_filename + ".npy"
+    # name_test = "test_" + dest_filename + ".npy"
+    # csv_train = "train_" + dest_filename + "_metadata.csv"
+    # csv_test = "test_" + dest_filename + "_metadata.csv"
+    #
+    # if platform.system() != 'Windows':
+    #     name_train = dest_directory + name_train
+    #     name_test = dest_directory + name_test
+    #     csv_train = dest_directory + csv_train
+    #     csv_test = dest_directory + csv_test
 
     with open(name_train, 'wb') as file:
         np.save(file, complete_train)
@@ -144,8 +139,6 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
 
 
 if __name__ == '__main__':
-    # vogliamo: train.npy (number_meshes, number_vertices, 3) (no Faces because they all share topology)
-    # ------ args:
 
     parser = argparse.ArgumentParser(description="Split dataset")
 
@@ -153,7 +146,7 @@ if __name__ == '__main__':
                         help="Path to the folder that contains the NEW dataset")
     parser.add_argument("--dest_directory", dest="dest_directory", default='',
                         help="Path to the folder where we want to save the csv and npy files")
-    parser.add_argument("--train_p", dest="train_p", default='',
+    parser.add_argument("--train_p", dest="train_p", default=70,
                         help="% of training samples, expressed as integer")
     parser.add_argument("--dest_f", dest="dest_f", default='',
                         help="Destination filename (for npy e csv to combine)")
@@ -165,7 +158,7 @@ if __name__ == '__main__':
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
-    create_npy_csv_files(directory=args.directory, dest_directory=dest_dir, train_perc=train_p,
+    create_npy_csv_files(directory=right_slash(args.directory), dest_directory=right_slash(dest_dir), train_perc=train_p,
                          dest_filename=args.dest_f)
     # no slash for directory,
     # yes slash for dest_directory

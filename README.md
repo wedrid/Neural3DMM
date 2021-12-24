@@ -1,35 +1,30 @@
-Commenti ADG
-Per avviare: 
-
--> init.py: si occupa di creare la gerarchia delle directory, data_generation (ha bisogno di train.npy, test.npy, template.obj). Questa si chiama, in generale, una sola volta. 
-
--> create_downsampling_matrices.py: crea le matrici di downsampling. Serve mpi-mesh. Qui si può andare ad agire, volessimo cambiare il downsampling. 
-
--> main.py: si avvia il training.. da definirsi il dettaglio. 
-
-## Sequenza chiamate (per ora): 
-- `python init.py --root_dir path_to_root_dir --bool 0`  // crea la gerarchia delle cartelle sotto root_dir
-- Inserisco train.npy e test.npy in preprocessed. Inserisco template.obj in template.
-  (qui poi in pratica questi file dovranno essere generabili ... abbiamo bisogno di una funzione che ci faccia lo split
-  e poi in base a quello li generi )
-- `python init.py --root_dir path_to_root_dir --bool 1` // genera i file paths_train.npy etc 
-- [Se eseguito in locale per Chiara e Niki] `python rename_paths.py --json_file path_to_dict_path_json_file --heading /mnt/c/`
-- `python create_downsampling_matrices --dict path_to_dict_path_json` // se eseguito in locale per Chiara e Niki - usare il file con wls
-- `python main.py ...`
-
-# Su Yoda
+# Sequenza chiamate (su Yoda)
 - Crea root_dir ! (nell'esempio 'prova1')
 
-- `python init.py --root_dir /home/egrappolini/CG3D/prova1 --bool 0`
+- `python init.py --root_dir /home/egrappolini/CG3D/prova1 --bool 0`  // crea la gerarchia delle cartelle sotto root_dir
 
-- `python init.py --root_dir /home/egrappolini/CG3D/prova1 --bool 1`
+- Inserisco train.npy e test.npy in preprocessed. Inserisco template.obj in template. Abbiamo tutte le mesh in ply, per avere obj, aprire mesh lab e esportare la mesh in obj (togliere la spunta per le normali se c'è)
+  train.npy e test.npy sono generabili attraverso le funzioni *ply_to_numpy* (per i dataset COMA) e *ply_to_numpy_new_dataset* (per i nuovi dataset)
+- ``` python ./utils/ply_to_numpy.py --directory --directory /home/egrappolini/CG3D/COMA_data_noses --dest_directory /home/egrappolini/CG3D/Neural3DMM_noses/data/nasi_coma/ --dest_f nasi ```
+- ``` python ./utils/ply_to_numpy_new_dataset.py .../FRGC_Bosph_registeredMeshes_TPAMI_noses --dest_directory .../Neural3DMM_noses/nasi_coma/ --dest_f nasi --train_p 70```
+ 
+- __NB:__ no slash per directory, sì slash in dest_directory, di default train_p è 70, la cartella di destinazione può essere dovunque (anche se non esiste viene creato in automatico). Le cartelle per il nuovo dataset (nasi e parte alta nasi) sono in */home/egrappolini/CG3D/Neural3DMM_noses/data/...*, con nomi che richiamano il contenuto (i file poi sono stati copiati e rinominati nella cartella preprocessed della root_dir corrente). Potremmo direttamente utilizzare come dest_directory la cartella preprocessed della root_dir in cui stiamo lavorando, ricordando poi di rinominare i file npy (gli altri script cercano train e test npy)
 
-- `python create_downsampling_matrices.py --dict /home/egrappolini/CG3D/prova1/dict_path.json`
+- `python init.py --root_dir /home/egrappolini/CG3D/prova1 --bool 1`  // genera i file paths_train.npy etc 
+- [Se eseguito in locale per Chiara e Niki] `python rename_paths.py --json_file path_to_dict_path_json_file --heading /mnt/c/`
 
-### train
+- `python create_downsampling_matrices.py --dict /home/egrappolini/CG3D/prova1/dict_path.json`  // se eseguito in locale per Chiara e Niki, usare il file con wls
+
+### Train
 - `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --epochs 500`
-### test
+### Test
 - `python main.py --dict /home/egrappolini/CG3D/prova1/dict_path.json --mode 'test' --checkpoint_file /home/egrappolini/CG3D/prova1/results/spirals_\ autoencoder/checkpoints/checkpoint490`
+
+## Training SOLO parte alta nasi
+
+- In `create_downsampling_matrices.py` tra gli args, va modificato *ds_factor*, mettendo in default [4, 4, 4, 1]
+- In `main.py` (all'inizio) *ds_factor* va settato a [4, 4, 4, 1], mentre *reference_points* va settato a [[162]] (vertice che in COMA stava piuttosto centrale... provando sembra funzionare, ma può essere cambiato)
+- In generale, in tutti gli altri script in cui compaiono questi parametri, i loro valori devono essere modificati nel modo di cui sopra 
 
 ======== 
 Comando per avviare model_extraction.py
@@ -40,7 +35,7 @@ python model_extraction.py --dict /home/egrappolini/CG3D/filtri_coma/dict_path.j
 -------------------------------------------
 ![Neural3DMM architecture](images/architecture_figure1.png "Neural3DMM architecture")
 
-# Project Abstract 
+# Project Abstract
 *Generative models for 3D geometric data arise in many important applications in 3D computer vision and graphics. In this paper, we focus on 3D deformable shapes that share a common topological structure, such as human faces and bodies. Morphable Models and their variants, despite their linear formulation, have been widely used for shape representation, while most of the recently proposed nonlinear approaches resort to intermediate representations, such as 3D voxel grids or 2D views. In this work, we introduce a novel graph convolutional operator, acting directly on the 3D mesh, that explicitly models the inductive bias
 of the fixed underlying graph. This is achieved by enforcing consistent local orderings of the vertices of the graph,
 through the spiral operator, thus breaking the permutation invariance property that is adopted by all the prior work
@@ -89,7 +84,7 @@ The following is the organization of the dataset directories expected by the cod
 
 # Usage
 
-#### Data preprocessing 
+#### Data preprocessing
 
 In order to use a pytorch dataloader for training and testing, we split the data into seperate files by:
 
