@@ -10,7 +10,7 @@ import argparse
 import numpy as np
 import json
 
-ds_factors = [4, 4, 4, 4]
+ds_factors = [4, 4, 4, 4] #  [4, 4, 4, 1] per mesh parte alta nasi (era [4, 4, 4, 4] ma non tornava)
 step_sizes = [2, 2, 1, 1, 1]
 filter_size_enc = [[3, 16, 32, 64, 128], [[], [], [], [], []]]
 filter_size_dec = [[128, 64, 32, 32, 16], [[], [], [], [], 3]]
@@ -39,6 +39,7 @@ else:
     dilation = None
 #FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
 reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
+# 162 per mesh parte alta nasi (abbiamo provato)
 
 
 def main():
