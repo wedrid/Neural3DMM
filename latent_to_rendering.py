@@ -36,7 +36,8 @@ if dilation_flag:
 else:
     dilation = None
 #FIXME reference_point!! Forse dovrebbe essere il vertice del capo del naso ? proviamo con 450
-reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
+#reference_points = [[414]]  # 414  [[3567,4051,4597]] used for COMA with 3 disconnected components
+reference_points = [[414]]
 
 def save_predictions(pred_tensor_mod, out_path): 
     print("size")
@@ -61,7 +62,7 @@ def save_predictions(pred_tensor_mod, out_path):
     print("Saved")
     return
 
-def render_pred(pred_tensor_mod): 
+def render_pred(pred_tensor_mod, ref_topology): 
     print("size")
     print(pred_tensor_mod.size())
     #gets rid of dummy node for correct rendering (with shading)
@@ -71,11 +72,11 @@ def render_pred(pred_tensor_mod):
     #print(one_pred)
     
     print(final_preds.shape)
-    render_mesh.render_mesh(one_pred[:-1,:], "./utils/reference_nose_mesh.ply")
+    render_mesh.render_mesh(one_pred[:-1,:], ref_topology)
     
     return
 
-def decode_and_render_latent(latent, model, shapedata_mean, shapedata_std):
+def decode_and_render_latent(latent, model, shapedata_mean, shapedata_std, ref_topo):
     if latent.ndim == 1: 
         latent = np.expand_dims(latent, axis=0)
     mm_constant = 1000
@@ -83,7 +84,7 @@ def decode_and_render_latent(latent, model, shapedata_mean, shapedata_std):
     pred = model.decode(torch.tensor(latent))
     pred = pred[:, :-1] #gets rid of dummy node
     pred_tensor_mod = (pred * shapedata_std + shapedata_mean) * mm_constant
-    render_pred(pred_tensor_mod) 
+    render_pred(pred_tensor_mod, ref_topo) 
 
 def decode_and_save_latent(latent, model, shapedata_mean, shapedata_std, out_path):
     mm_constant = 1000
@@ -223,9 +224,15 @@ def init(checkpoint = False, dict_path = False):
         return False
 
 def main():
-    model, shapedata_mean, shapedata_std = init(dict_path="./TMP/dict_path.json", checkpoint="checkpoint290")
+    # FOR COMA :#model, shapedata_mean, shapedata_std = init(dict_path="./TMP/dict_path.json", checkpoint="checkpoint290")
     print("LATENT: ")
-    latents = np.load("mylatents.npy")
+    #FOR COMA TOP: model, shapedata_mean, shapedata_std = init(dict_path="./trained_models/filtri_coma_TOP/dict_path.json", checkpoint="checkpoint290")
+    # FOR COMA latents: # latents = np.load("mylatents.npy")
+    # FOR COMA TOP: # latents = np.load("./latents/latents_COMA_top/test_COMA_top_latents.npy")
+    
+    model, shapedata_mean, shapedata_std = init(dict_path="./trained_models/new_dataset/dict_path.json", checkpoint="checkpoint290")
+    latents = np.load("./latents/latents_complete_new_dataset/test_newdataset_latents.npy")
+
     print(latents.shape)
     norms = []
     for item in latents:
@@ -233,13 +240,13 @@ def main():
     norms = np.array(norms)
     print(f"Min: {norms[np.argmin(norms)]}, Max: {norms[np.argmax(norms)]}")
     #latents = torch.tensor(latents[4000:4010,:])
-    decode_latent_segment(latents[np.argmax(norms)], latents[np.argmin(norms)], 3, model, shapedata_mean, shapedata_std)
+    #decode_latent_segment(latents[np.argmax(norms)], latents[np.argmin(norms)], 3, model, shapedata_mean, shapedata_std)
     #decode_latent_segment(latents[0], latents[500], 3, model, shapedata_mean, shapedata_std)
     
     #decode_and_render_latent(torch.zeros(16)+10, model, shapedata_mean, shapedata_std)
-    #decode_and_render_latent(latents[120], model, shapedata_mean, shapedata_std)
-    #decode_and_render_latent(latents[0], model, shapedata_mean, shapedata_std)
-
+    #decode_and_render_latent(latents[120], model, shapedata_mean, shapedata_std, "./utils/reference_nose_mesh.ply")
+    # FOR COMA TOP: decode_and_render_latent(latents[10], model, shapedata_mean, shapedata_std, "./rendering_references/COMA_top_reference.ply")
+    decode_and_render_latent(latents[10], model, shapedata_mean, shapedata_std, "./rendering_references/new_dataset_reference.ply")
     return 
     latents = torch.tensor(latents[1000:1005,:])
     print(f"SHAPEH LATENTS: {latents.size()}")

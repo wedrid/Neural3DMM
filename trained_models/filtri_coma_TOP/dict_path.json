@@ -1,0 +1,18 @@
+{
+    "reference_mesh_file": "./trained_models/filtri_coma_TOP/template/template.obj",
+    "downsample_directory": "./trained_models/filtri_coma_TOP/template/COMA_downsample",
+    "summary_path": "./trained_models/filtri_coma_TOP/results/spirals_ autoencoder/summaries/",
+    "checkpoint_path": "./trained_models/filtri_coma_TOP/results/spirals_ autoencoder/checkpoints/",
+    "samples_path": "./trained_models/filtri_coma_TOP/results/spirals_ autoencoder/samples/",
+    "prediction_path": "./trained_models/filtri_coma_TOP/results/spirals_ autoencoder/predictions/",
+    "points_train_path": "./trained_models/filtri_coma_TOP/preprocessed/points_train",
+    "points_val_path": "./trained_models/filtri_coma_TOP/preprocessed/points_val",
+    "points_test_path": "./trained_models/filtri_coma_TOP/preprocessed/points_test",
+    "root_dir": "./trained_models/filtri_coma_TOP",
+    "name": "",
+    "downsample_method": "COMA_downsample",
+    "generative_model": "autoencoder",
+    "nVal": 100,
+    "data": "./trained_models/filtri_coma_TOP/preprocessed/",
+    "results_folder": "./trained_models/filtri_coma_TOP/results/spirals_ autoencoder"
+}
