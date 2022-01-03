@@ -164,7 +164,7 @@ def get_spirals(mesh, adj, trig, reference_points, n_steps=1, padding='zero', co
         while len(trig_central) > 0 and init_vert is not None:
             cur_v = ring[-1]
             cur_t = [t for t in trig_central if t in trig[cur_v]]
-            if len(ring) == 1:
+            if len(ring) == 1 and len(cur_t) > 0: #TODO RIVEDERE 
                 orientation_0 = (cur_t[0][0] == i and cur_t[0][1] == cur_v) \
                                 or (cur_t[0][1] == i and cur_t[0][2] == cur_v) \
                                 or (cur_t[0][2] == i and cur_t[0][0] == cur_v)
