@@ -2,24 +2,8 @@ from os import listdir
 from os.path import isfile, join
 import numpy as np
 import pandas as pd
-
-from ply_to_numpy import get_numpy_from_file, right_slash
-from add_info import get_neutrals
 import argparse
 import os
-import platform
-
-
-def get_heading(filename):
-    if filename.startswith('b'):
-        # print("bosphorus_noLm_SLC dataset heading")
-        spl = filename.split('.')[0]  # nome senza estensione ply
-        f = spl.split('_')[0]  # estraggo la parte che considero come intestazione
-    else:
-        # print("FRGC_noLm_SLC dataset heading")
-        f = filename[:filename.index('d') + 1]  # estraggo la parte fino a 'd' compresa
-
-    return f
 
 
 def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
@@ -51,8 +35,11 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
     train_gt = []  # nomi mesh gt
     test_gt = []
 
-    expr_train = []
+    expr_train = []  # espressione
     expr_test = []
+
+    gender_train = [] # genere
+    gender_test = []
 
     tot = 0
     for i in range(len(subdir_list)):
@@ -83,11 +70,11 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
         # per ora fissiamo lo split (le prime tot entità stanno nel train, le restanti nel test
         train_i, test_i = indices[:train_size], indices[train_size:(train_size + test_size)]  # inidici di train e test
 
-        # mi prendo le mesh corrispondenti agli indici che ho creato
-        # controllando le intestazioni
+        # mi prendo le mesh corrispondenti agli indici che ho creato, controllando le intestazioni
 
-        # indici = filtered_list_replicata # [1, 1, 1, 21, 21, 21]  # stessa dimensione di files
         [indici, comments_list] = get_neutrals(dataset=subdir_list[0][i], files=files, unici=unici, counts=counts)
+        [_, genders] = get_genders(dataset=subdir_list[0][i], files=files)  # TODO: gender info
+        # il primo output sarebbe il numero di individui, ma questa info è contenuta già in unici
 
         # inizializzo il rappresentante
         rappr = temp_subdir + "/" + files[indici[0]]
@@ -125,11 +112,13 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
                 complete_train = np.concatenate((complete_train, temp), axis=0)  # npy
                 train.append(files[k])  # nome mesh
                 expr_train.append(comments_list[k])  # espressione mesh
+                gender_train.append(genders[k])  # genere mesh
             else:
                 # test
                 complete_test = np.concatenate((complete_test, temp), axis=0)
                 test.append(files[k])
                 expr_test.append(comments_list[k])
+                gender_test.append(genders[k])
 
             ## GT
             if ind_gt in train_i:
@@ -167,7 +156,8 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
     myMetadata_train = pd.DataFrame(
         {
             'mesh_file_name': train,
-            'expr_info': expr_train
+            'expr_info': expr_train,
+            'gender': gender_train
 
         }
     )
@@ -175,7 +165,8 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
     myMetadata_test = pd.DataFrame(
         {
             'mesh_file_name': test,
-            'expr_info': expr_test
+            'expr_info': expr_test,
+            'gender': gender_test
         }
     )
 
@@ -193,7 +184,7 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
     myMetadata_train.to_csv(csv_train)
     myMetadata_test.to_csv(csv_test)
 
-    ## GT
+    ## GT (non sono necessari)
 
     myMetadata_train_gt = pd.DataFrame(
         {
@@ -224,8 +215,10 @@ def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
 
 
 if __name__ == '__main__':
+    from ply_to_numpy import get_numpy_from_file, right_slash
+    from add_info import get_neutrals, get_genders, get_heading
 
-    parser = argparse.ArgumentParser(description="Split dataset")
+    parser = argparse.ArgumentParser(description="Split new dataset")
 
     parser.add_argument("--directory", dest="directory", default=None,
                         help="Path to the folder that contains the NEW dataset")
@@ -252,7 +245,12 @@ if __name__ == '__main__':
     # --dest_directory C:/Users/PycharmProjects/Neural3DMM_noses/npy_nuovo_dataset/ --train_p 70 --dest_f pino
 
 
-    # per esecuzione da console ...
+
+
+
+
+
+    #################################################### per esecuzione da console ...
     # parser.add_argument("--directory", dest="directory", default='D:/Progetto_CG3D/FRGC_Bosph_registeredMeshes_TPAMI_noses',
     #                     help="Path to the folder that contains the NEW dataset")
     # parser.add_argument("--dest_directory", dest="dest_directory",
@@ -418,129 +416,3 @@ if __name__ == '__main__':
     # ###
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def create_npy_csv_files(directory, dest_directory, train_perc, dest_filename):
-#     # due sottocartelle : bosphorus_noLm_SLC, FRGC_noLm_SLC
-#     subdir_list = [f for f in sorted(listdir(directory)) if not isfile(join(directory, f))]
-#
-#     # primo elemento di una delle due sottocartelle
-#     sample_file = directory + "/" + subdir_list[1] + "/bs000_CAU_A22A25_0.ply"
-#     print("sample file: ", sample_file)
-#
-#     complete_train = np.zeros(get_numpy_from_file(sample_file).shape)
-#     complete_train = np.expand_dims(complete_train, axis=0)
-#
-#     complete_test = np.zeros(get_numpy_from_file(sample_file).shape)
-#     complete_test = np.expand_dims(complete_test, axis=0)
-#
-#     train = []  # nomi mesh
-#     test = []
-#     tot = 0
-#     for i in range(len(subdir_list)):
-#         print("Cartella: ", subdir_list[i])
-#         temp_subdir = directory + "/" + subdir_list[i]
-#         files = [f for f in sorted(listdir(temp_subdir)) if isfile(right_slash(join(temp_subdir, f)))]
-#
-#         files_head = []
-#         for i in range(len(files)):
-#             f = files[i]
-#             f = get_heading(f)
-#             files_head.append(f)
-#
-#         unici = np.unique(files_head)
-#
-#         size = len(unici)  # numero di 'entità'
-#         indices = np.arange(size)
-#
-#         train_size = int(round((train_perc * size) / 100, 0))
-#         test_size = size - train_size
-#
-#         print("\tTRAIN SIZE: ", train_size)
-#         print("\tTEST SIZE: ", test_size)
-#
-#         # SPLIT
-#         # np.random.shuffle(indices)
-#         # per ora fissiamo lo split (le prime 326 entità stanno nel train, le restanti nel test
-#         train_i, test_i = indices[:train_size], indices[train_size:(train_size + test_size)]  # inidici di train e test
-#
-#         # mi prendo le mesh corrispondenti agli indici che ho creato
-#         # controllando le intestazioni
-#         for k in range(len(files)):  # ciclo su files
-#             f = get_heading(files[k])
-#
-#             name_file = temp_subdir + "/" + files[k]
-#             print("NAME: ", name_file)
-#             temp = get_numpy_from_file(name_file)
-#             temp = np.expand_dims(temp, axis=0)
-#
-#             # mi devo prendere l'indice di unici e vedere dove si trova se in train o test
-#             ind = np.where(unici == f)[0][0]  # where restituisce una tupla
-#
-#             if ind in train_i:
-#                 # train
-#                 complete_train = np.concatenate((complete_train, temp), axis=0)  # npy
-#                 train.append(files[k])  # nome mesh
-#             else:
-#                 # test
-#                 complete_test = np.concatenate((complete_test, temp), axis=0)
-#                 test.append(files[k])
-#
-#             tot += 1
-#
-#     print(f"Finish: shape of train is {complete_train.shape} final shape is ")
-#     complete_train = complete_train[1:, :, :]
-#     print(complete_train.shape)
-#
-#     print(f"Finish: shape of test is {complete_test.shape} final shape is ")
-#     complete_test = complete_test[1:, :, :]
-#     print(complete_test.shape)
-#
-#     print(f"Total number of meshes considered is: {tot}")
-#
-#     myMetadata_train = pd.DataFrame(
-#         {
-#             'mesh_file_name': train
-#         }
-#     )
-#
-#     myMetadata_test = pd.DataFrame(
-#         {
-#             'mesh_file_name': test
-#         }
-#     )
-#
-#     name_train = dest_directory + "train_" + dest_filename + ".npy"
-#     name_test = dest_directory + "test_" + dest_filename + ".npy"
-#     csv_train = dest_directory + "train_" + dest_filename + "_metadata.csv"
-#     csv_test = dest_directory + "test_" + dest_filename + "_metadata.csv"
-#
-#     with open(name_train, 'wb') as file:
-#         np.save(file, complete_train)
-#
-#     with open(name_test, 'wb') as file:
-#         np.save(file, complete_test)
-#
-#     myMetadata_train.to_csv(csv_train)
-#     myMetadata_test.to_csv(csv_test)
