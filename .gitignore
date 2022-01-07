@@ -114,6 +114,8 @@ cluster_renderings_hdbscan/
 renderings/
 dataset_npy/
 clusters_labels/
+explore_clusters/outliars_renderings/
+filtri_coma_new/
 
 TMP
 .TMP/
