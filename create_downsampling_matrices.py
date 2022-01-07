@@ -53,7 +53,7 @@ def create_downsampling_matrices(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="mpi-mesh execution")
-    parser.add_argument("--ds_factors", dest="ds_factors", default=[4, 4, 4, 4], help="ds_factors")
+    parser.add_argument("--ds_factors", dest="ds_factors", default=[4, 4, 4, 4], help="ds_factors")  # [4, 4, 4, 1] per mesh parte alta nasi
     parser.add_argument("--shuffle", dest="shuffle", default=True, help="Shuffle")
     parser.add_argument("--normalization", dest="normalization", default=True, help="Normalization")
     parser.add_argument("--dict", dest="dict_path", default=None, help="Path to the json file containing dict_path")

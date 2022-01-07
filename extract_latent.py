@@ -129,6 +129,10 @@ def main():
         subset = torch.utils.data.Subset(dataloader_test, subset_indices)
         testloader_subset = torch.utils.data.DataLoader(subset, batch_size=1, num_workers=0, shuffle=False)
         print(testloader_subset)'''
+
+        # TODO: Controllare input
+        # all_data = dataset_test.getWholeProcessedDataset("./explore_clusters/good_data/train_nasi.npy")
+
         all_data = dataset_test.getWholeProcessedDataset("./trained_models/new_dataset/preprocessed/test.npy")
 
         #all_data = dataset_test.getWholeProcessedDataset(f"./dataset_npy/{train_test}.npy")
@@ -162,6 +166,10 @@ def main():
         numpy_latents = latent_code.cpu().detach().numpy()
         print(numpy_latents[0])
         #saves latents
+
+        # TODO: Controllare input
+        # with open(f"./explore_clusters/train_nasi_latents.npy", 'wb') as file:
+
         with open("./latents/latents_COMA_top/test_newdataset_latents.npy", 'wb') as file:
             np.save(file, numpy_latents)
         
